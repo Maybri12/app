@@ -2,7 +2,7 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-toolbar-title>Importadora </v-toolbar-title>
+                <v-toolbar-title>Marca</v-toolbar-title>
                 <v-divider
                 class="mx-2"
                 inset
@@ -14,7 +14,7 @@
                 <v-spacer></v-spacer>
                 <v-dialog v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
-                        <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo </v-btn>
+                        <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
                     </template>
                     <v-card>
                         <v-card-title>
@@ -23,28 +23,15 @@
                         <v-card-text>
                         <v-container grid-list-md>
                             <v-layout wrap>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="nombre" label="Nombre">                                        
-                                    </v-text-field>
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field v-model="nombre" label="Nombre"></v-text-field>
                                 </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="direccion" label="Dirección">
-                                    </v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="telefono" label="Teléfono">
-                                    </v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="email" label="Email">
-                                    </v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm8 md8 lg8 xl8>
-                                  <v-autocomplete :items="personas" v-model="persona" label="Proveedor">
-                                  </v-autocomplete>
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field v-model="descripcion" label="Descripción"></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12 v-show="valida">
                                     <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v">
+
                                     </div>
                                 </v-flex>
                             </v-layout>
@@ -90,7 +77,7 @@
                         </v-card-title>
                        
                         <v-card-text>
-                            Estás a punto de eliminar un Proveedor <b>{{adNombre}}</b> 
+                            Estás a punto de eliminar la categoria <b>{{adNombre}}</b> 
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
@@ -105,10 +92,10 @@
                     </v-card>
                 </v-dialog>
             </v-toolbar>
-            <Spinner v-if="ifLoad"/>
+              <Spinner v-if="ifLoad">Resetear</Spinner>
             <v-data-table v-else
                 :headers="headers"
-                :items="personas1"
+                :items="categorias"
                 :search="search"
                 class="elevation-1"
             >
@@ -136,8 +123,8 @@
                         >
                         check
                         </v-icon>
-                    </template> &nbsp;&nbsp;
-                     <v-icon 
+                    </template>&nbsp;&nbsp;
+                     <v-icon
                     small
                     class="mr-2"
                     @click="EliminarMostrar(props.item)"
@@ -146,8 +133,7 @@
                     </v-icon>
                 </td>
                 <td>{{ props.item.nombre }}</td>
-                 <td>{{ props.item.email }}</td>
-                <td>{{ props.item.persona.nombre }}</td>
+                <td>{{ props.item.descripcion }}</td>
                 <td>
                     <div v-if="props.item.estado">
                         <span class="blue--text">Activo</span>
@@ -162,45 +148,37 @@
                 </template>
             </v-data-table>
         </v-flex>
+      
     </v-layout>
 </template>
 <script>
     import axios from 'axios'
     import Spinner from '../layout/Spinner.vue'
-   
     export default {
-         components :{Spinner},
+        components :{Spinner},
         data(){
             return{
                 dialog: false,
-                 ifLoad: false,
+                ifLoad: false,
                 search:'',
+                categorias:[],
                 headers: [
                     { text: 'Opciones', value: 'opciones', sortable: false },
-                    { text: 'Proveedor', value: 'persona.nombre', sortable: true },
-                     { text: 'Email', value: 'email', sortable: true },
-                    { text: 'Representante', value: 'tipo_persona', sortable: true },
-                    { text: 'Estado', value: 'estado', sortable: false  } 
+                    { text: 'Nombre', value: 'nombre', sortable: true },
+                    { text: 'Descripción', value: 'descripcion', sortable: false },
+                    { text: 'Estado', value: 'estado', sortable: false },
                 ],
                 editedIndex: -1,
                 id:'',
                 nombre:'',
-                tipo_persona:'Proveedor',
-                tipo_documento:'',
-                num_documento: '',
-                direccion: '',
-                telefono: '',
-                email: '',
+                descripcion:'',
                 valida:0,
                 validaMensaje:[],
                 adModal:0,
                 adModal2:false,
                 adAccion:0,
                 adNombre:'',
-                adId:'',
-                 persona:'',
-                personas:[],
-                personas1:[],
+                adId:''
             }
         },
         computed: {
@@ -215,44 +193,25 @@
         },
         created () {
             this.listar()
-            this.selectPersona();
         },
         methods: {
-              selectPersona(){
-                let me=this;
-                let personaArray=[];
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};            
-                axios.get('persona/listProveedores',configuracion).then(function (response){
-                    personaArray=response.data;
-                    personaArray.map(function(x){
-                        me.personas.push({text:x.nombre, value:x.id});
-                    });
-                }).catch(function(error){
-                    console.log(error);
-                });
-            },
             listar(){
                 this.ifLoad = true;
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};            
-                axios.get('proveedor/list',configuracion).then(function (response){
-                    me.personas1=response.data;
-                     me.ifLoad = false;
+                axios.get('marca/list',configuracion).then(function (response){
+                    me.categorias=response.data;
+                    me.ifLoad = false;
                 }).catch(function(error){
                      this.ifLoad = false;
                     console.log(error);
                 });
-
             },
             limpiar(){
                 this.id='';
                 this.nombre='';
-                this.num_documento='';
-                this.direccion='';
-                this.telefono='';
-                this.email='';
+                this.descripcion='';
                 this.valida=0;
                 this.validaMensaje=[];
                 this.editedIndex=-1;
@@ -261,19 +220,10 @@
                 this.valida=0;
                 this.validaMensaje=[];
                 if(this.nombre.length<1 || this.nombre.length>50){
-                    this.validaMensaje.push('El nombre de la persona debe tener entre 1-50 caracteres.');
+                    this.validaMensaje.push('El nombre de la categoría debe tener entre 1-50 caracteres.');
                 }
-                if(!this.persona){
-                    this.validaMensaje.push('Seleccione un Representante.');
-                }
-                if(this.direccion.length>70){
-                    this.validaMensaje.push('La dirección no debe tener más de 70 caracteres.');
-                }
-                if(this.telefono.length>20){
-                    this.validaMensaje.push('El teléfono no debe tener más de 20 caracteres.');
-                }
-                if(this.nombre.length>50){
-                    this.validaMensaje.push('El email del usuario debe tener menos de 50 caracteres.');
+                if(this.descripcion.length>255){
+                    this.validaMensaje.push('La descripción de la categoría no debe tener más de 255 caracteres.');
                 }
                 if (this.validaMensaje.length){
                     this.valida=1;
@@ -289,14 +239,8 @@
                 }
                 if (this.editedIndex >-1){
                     //Código para editar
-                    axios.put('proveedor/update',{
-                        'id':this.id,
-                        'nombre':this.nombre,
-                        'personaId':this.persona,
-                        'direccion':this.direccion,
-                        'telefono': this.telefono,
-                        'email':this.email
-                    },configuracion)
+                   console.log(this.nombre)
+                    axios.put('marca/update',{'id':this.id,'nombre':this.nombre,'descripcion':this.descripcion},configuracion)
                     .then(function(response){
                         me.limpiar();
                         me.close();
@@ -306,16 +250,8 @@
                         console.log(error);
                     });
                 }else{
-                   console.log (this.persona)
                     //Código para guardar
-                    axios.post('proveedor/add',
-                    {
-                        'personaId':this.persona,
-                        'nombre':this.nombre,
-                        'direccion':this.direccion,
-                        'telefono': this.telefono,
-                        'email':this.email
-                    },configuracion)
+                    axios.post('marca/add',{'nombre':this.nombre,'descripcion':this.descripcion},configuracion)
                     .then(function(response){
                         me.limpiar();
                         me.close();
@@ -328,12 +264,8 @@
             },
             editItem (item) {
                 this.id=item.id;
-                this.rol=item.rol;
                 this.nombre=item.nombre;
-                this.direccion=item.direccion;
-                this.telefono=item.telefono;
-                this.email=item.email;
-                this.persona=item.persona.id,
+                this.descripcion=item.descripcion;
                 this.dialog = true;
                 this.editedIndex=1;
             },
@@ -349,7 +281,8 @@
                     this.adModal=0;
                 }
             },
-                EliminarMostrar(item){
+               EliminarMostrar(item){
+                console.log(item)
                 this.adModal2=true;
                 this.adNombre=item.nombre;
                 this.adId=item.id;
@@ -359,11 +292,11 @@
                 this.adModal=0;
                 this.adModal2=false;
             },
-              remove(){
+            remove(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.delete(`proveedor/remove/${this.adId}`,{},configuracion)
+                axios.delete(`marca/remove/${this.adId}`,{},configuracion)
                     .then(function(response){
                         me.adModal2=false;
                         me.adNombre='';
@@ -378,7 +311,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('proveedor/activate',{'id':this.adId},configuracion)
+                axios.put('marca/activate',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -394,7 +327,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('proveedor/deactivate',{'id':this.adId},configuracion)
+                axios.put('marca/deactivate',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;

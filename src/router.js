@@ -15,6 +15,8 @@ import Compras from './components/Compra.vue'
 import Materiales from './components/Material'
 import Consultas from './components/Consultas.vue'
 import ConsultaIngresos from './components/ConsultaIngresos.vue'
+import Marca from './components/Marca.vue'
+import Entradas from './components/Entradas.vue'
 
 
 Vue.use(Router)
@@ -142,6 +144,22 @@ var router = new Router({
       path: '/consultasIngreso',
       name: 'consultasIngreso',
       component: ConsultaIngresos,
+      meta: {
+        administrador: true
+      }
+    },
+    {
+      path: '/marca',
+      name: 'marca',
+      component: Marca,
+      meta: {
+        administrador: true
+      }
+    },
+    {
+      path: '/entradas',
+      name: 'entradas',
+      component: Entradas,
       meta: {
         administrador: true
       }

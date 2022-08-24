@@ -2,7 +2,7 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-toolbar-title>Ingresos</v-toolbar-title>
+                <v-toolbar-title>Movimientos</v-toolbar-title>
                 <v-divider
                 class="mx-2"
                 inset
@@ -42,10 +42,10 @@
                                                 </td>
                                                 <td>{{ props.item.codigo }}</td>
                                                 <td>{{ props.item.nombre }}</td>
-                                                <td>{{ props.item.categoria.nombre }}</td>
+                                                <td>{{ props.item.categorium.nombre }}</td>
                                                 <td>{{ props.item.stock }}</td>
                                                 <td>{{ props.item.precio_venta }}</td>
-                                                <td>{{ props.item.descripcion }}</td>
+                                                <td>{{ props.item.marca.nombre }}</td>
                                                 <td>
                                                     <div v-if="props.item.estado">
                                                         <span class="blue--text">Activo</span>
@@ -94,7 +94,9 @@
                     </v-card>
                 </v-dialog>
             </v-toolbar>
-            <v-data-table
+             <Spinner v-if="ifLoad">Resetear</Spinner>
+             <div v-else>
+               <v-data-table 
                 :headers="headers"
                 :items="ingresos"
                 :search="search"
@@ -123,7 +125,7 @@
                         </v-icon>
                     </template>
                 </td>
-                <td>{{ props.item.usuario.nombre }}</td>
+                <td>{{ props.item.user.nombre }}</td>
                 <td>{{ props.item.persona.nombre }}</td>
                 <td>{{ props.item.tipo_comprobante }}</td>
                 <td>{{ props.item.num_comprobante }}</td>
@@ -143,6 +145,8 @@
                 <v-btn color="primary" @click="listar()">Resetear</v-btn>
                 </template>
             </v-data-table>
+             </div>
+            
             <v-container grid-list-sm class="pa-4 white" v-if="verNuevo">
                 <v-layout row wrap>
                     <v-flex xs12 sm4 md4 lg4 xl4>
@@ -198,7 +202,7 @@
                                         delete
                                         </v-icon>
                                     </td>
-                                    <td class="text-xs-center">{{ props.item.articulo }}</td>
+                                    <td class="text-xs-center">{{ props.item.nombre }}</td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.cantidad" type="number"></v-text-field></td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.precio" type="number"></v-text-field></td>
                                     <td class="text-xs-right">$ {{ props.item.cantidad * props.item.precio}}</td>
@@ -236,10 +240,13 @@
 </template>
 <script>
     import axios from 'axios'
+     import Spinner from '../layout/Spinner.vue'
     export default {
+         components :{Spinner},
         data(){
             return{
                 dialog: false,
+                 ifLoad: false,
                 search:'',
                 ingresos:[],
                 headers: [
@@ -253,7 +260,7 @@
                     { text: 'Total', value: 'total', sortable: false  },
                     { text: 'Estado', value: 'estado', sortable: false  }                
                 ],
-                _id:'',
+                id:'',
                 persona:'',
                 personas:[],
                 tipo_comprobante:'',
@@ -284,7 +291,7 @@
                     { text: 'Categoría',value: 'categoria.nombre', sortable: true},
                     { text: 'Stock',value: 'stock', sortable: false},
                     { text: 'Precio Venta',value: 'precio_venta', sortable: false},
-                    { text: 'Descripción', value: 'descripcion', sortable: false },              
+                    { text: 'Marca', value: 'descripcion', sortable: false },              
                     { text: 'Estado', value: 'estado', sortable: false }
                 ],
                 verDetalle:0,
@@ -323,7 +330,7 @@
                 axios.get('persona/listProveedores',configuracion).then(function (response){
                     personaArray=response.data;
                     personaArray.map(function(x){
-                        me.personas.push({text:x.nombre, value:x._id});
+                        me.personas.push({text:x.nombre, value:x.id});
                     });
                 }).catch(function(error){
                     console.log(error);
@@ -343,14 +350,14 @@
             },
             agregarDetalle(data){
                 this.errorArticulo=null;
-                if (this.encuentra(data._id)==true){
+                if (this.encuentra(data.id)==true){
                     this.errorArticulo='El artículo ya ha sido agregado.';
                 }
                 else{
                     this.detalles.push(
                         {
-                            _id:data._id,
-                            articulo:data.nombre,
+                            articuloId:data.id,
+                            nombre:data.nombre,
                             cantidad:1,
                             precio:data.precio_venta
                         }
@@ -362,7 +369,7 @@
             encuentra(id){
                 let sw=0;
                 for (var i=0;i<this.detalles.length;i++){
-                    if(this.detalles[i]._id==id){
+                    if(this.detalles[i].id==id){
                         sw=true;
                     }
                 }
@@ -378,8 +385,9 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};            
-                axios.get('articulo/list?valor='+this.texto,configuracion).then(function (response){
+                axios.get('articulo/listName?nombre='+this.texto,configuracion).then(function (response){
                     me.articulos=response.data;
+                    console.log(me.articulos);
                 }).catch(function(error){
                     console.log(error);
                 });
@@ -391,8 +399,9 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};            
-                axios.get('ingreso/query?_id='+id,configuracion).then(function (response){
-                    me.detalles=response.data.detalles;
+                axios.get('ingreso/queryDetalles?id='+id,configuracion).then(function (response){
+                    me.detalles=response.data;
+                    console.log('es',me.detalles);
                 }).catch(function(error){
                     console.log(error);
                 });
@@ -402,29 +411,32 @@
                 this.tipo_comprobante=item.tipo_comprobante;
                 this.serie_comprobante=item.serie_comprobante;
                 this.num_comprobante=item.num_comprobante;
-                this.persona=item.persona._id;
+                this.persona=item.persona.id;
                 this.impuesto=item.impuesto;
-                this.listarDetalles(item._id);
+                this.listarDetalles(item.id);
                 this.verNuevo=1;
                 this.verDetalle=1;
             },
             listar(){
+                this.ifLoad = true;
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};            
                 axios.get('ingreso/list',configuracion).then(function (response){
                     me.ingresos=response.data;
+                     me.ifLoad = false;
                 }).catch(function(error){
+                     this.ifLoad = false;
                     console.log(error);
                 });
 
             },
             limpiar(){
-                this._id='';
+                this.id='';
                 this.tipo_comprobante='';
                 this.serie_comprobante='';
                 this.num_comprobante='';
-                this.impuesto=0.18;
+                this.impuesto=0.12;
                 this.codigo='';
                 this.total=0;
                 this.totalParcial=0;
@@ -475,8 +487,8 @@
                 //Código para guardar
                 axios.post('ingreso/add',
                 {
-                    'persona':this.persona,
-                    'usuario':this.$store.state.usuario._id,
+                    'personaId':this.persona,
+                    'userId':this.$store.state.usuario.id,
                     'tipo_comprobante': this.tipo_comprobante,
                     'serie_comprobante': this.serie_comprobante,
                     'num_comprobante':this.num_comprobante,
@@ -496,7 +508,7 @@
             activarDesactivarMostrar(accion,item){
                 this.adModal=1;
                 this.adNombre=item.num_comprobante;
-                this.adId=item._id;
+                this.adId=item.id;
                 if (accion==1){
                     this.adAccion=1;
                 } else if(accion==2){
@@ -512,7 +524,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('ingreso/activate',{'_id':this.adId},configuracion)
+                axios.put('ingreso/activate',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -528,7 +540,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('ingreso/deactivate',{'_id':this.adId},configuracion)
+                axios.put('ingreso/deactivate',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;

@@ -32,11 +32,7 @@
                                     :items="roles" label="Rol">
                                     </v-select>
                                 </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-select v-model="tipo_documento"
-                                    :items="documentos" label="Tipo Documento">
-                                    </v-select>
-                                </v-flex>
+                               
                                 <v-flex xs12 sm6 md6>
                                     <v-text-field v-model="num_documento" label="Número Documento">
                                     </v-text-field>
@@ -132,8 +128,6 @@
                     </template>
                 </td>
                 <td>{{ props.item.nombre }}</td>
-                <td>{{ props.item.rol }}</td>
-                <td>{{ props.item.tipo_documento }}</td>
                 <td>{{ props.item.num_documento }}</td>
                 <td>{{ props.item.direccion }}</td>
                 <td>{{ props.item.telefono }}</td>
@@ -165,8 +159,6 @@
                 headers: [
                     { text: 'Opciones', value: 'opciones', sortable: false },
                     { text: 'Nombre', value: 'nombre', sortable: true },
-                    { text: 'Rol', value: 'rol', sortable: true },
-                    { text: 'Tipo Documento', value: 'tipo_documento', sortable: true },
                     { text: 'Número Documento', value: 'num_documento', sortable: false  },
                     { text: 'Dirección', value: 'direccion', sortable: false  },
                     { text: 'Teléfono', value: 'telefono', sortable: false  },
@@ -174,7 +166,7 @@
                     { text: 'Estado', value: 'estado', sortable: false  } 
                 ],
                 editedIndex: -1,
-                _id:'',
+                id:'',
                 nombre:'',
                 rol:'',
                 roles: ['Administrador','Almacenero','Vendedor'],
@@ -219,7 +211,7 @@
 
             },
             limpiar(){
-                this._id='';
+                this.id='';
                 this.nombre='';
                 this.num_documento='';
                 this.direccion='';
@@ -269,7 +261,7 @@
                 if (this.editedIndex >-1){
                     //Código para editar
                     axios.put('usuario/update',{
-                        '_id':this._id,
+                        'id':this.id,
                         'rol':this.rol,
                         'nombre':this.nombre,
                         'tipo_documento':this.tipo_documento,
@@ -311,7 +303,7 @@
                 }
             },
             editItem (item) {
-                this._id=item._id;
+                this.id=item.id;
                 this.rol=item.rol;
                 this.nombre=item.nombre;
                 this.tipo_documento=item.tipo_documento;
@@ -326,7 +318,7 @@
             activarDesactivarMostrar(accion,item){
                 this.adModal=1;
                 this.adNombre=item.nombre;
-                this.adId=item._id;
+                this.adId=item.id;
                 if (accion==1){
                     this.adAccion=1;
                 } else if(accion==2){
@@ -342,7 +334,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('usuario/activate',{'_id':this.adId},configuracion)
+                axios.put('usuario/activate',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -358,7 +350,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('usuario/deactivate',{'_id':this.adId},configuracion)
+                axios.put('usuario/deactivate',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;

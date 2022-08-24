@@ -26,7 +26,7 @@
                         <v-card-text>
                         <v-container grid-list-md>
                             <v-layout wrap>
-                                <v-flex xs12 sm6 md6>
+                                <v-flex xs12 sm12 md12>
                                     <v-text-field v-model="codigo" label="Código">                                        
                                     </v-text-field>
                                 </v-flex>
@@ -34,6 +34,12 @@
                                     <v-select v-model="categoria"
                                         :items="categorias"
                                         label="Categoría">
+                                    </v-select>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-select v-model="marca"
+                                        :items="marcas"
+                                        label="Marcas">
                                     </v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12>
@@ -160,7 +166,7 @@
                 <td> {{props.item.categorium.nombre}} </td>
                 <td>{{ props.item.stock }}</td>
                 <td>{{ props.item.precio_venta }}</td>
-                <td>{{ props.item.descripcion }}</td>
+                <td>{{ props.item.marca.nombre }}</td>
                 <td>
                     <div v-if="props.item.estado">
                         <span class="blue--text">Activo</span>
@@ -197,13 +203,15 @@
                     { text: 'Categoría',value: 'categorium.nombre', sortable: true},
                     { text: 'Stock',value: 'stock', sortable: false},
                     { text: 'Precio Venta',value: 'precio_venta', sortable: false},
-                    { text: 'Descripción', value: 'descripcion', sortable: false },              
+                    { text: 'Marca', value: 'descripcion', sortable: false },              
                     { text: 'Estado', value: 'estado', sortable: false }
                 ],
                 editedIndex: -1,
                 id:'',
                 categoria:'',
                 categorias:[],
+                marca:'',
+                marcas : [],
                 codigo: '',
                 nombre:'',
                 stock:0,
@@ -231,6 +239,7 @@
         created () {
             this.listar();
             this.selectCategoria();
+            this.selectMarcas();
         },
         methods: {
             crearPDF(){
@@ -276,6 +285,21 @@
                     console.log(error);
                 });
             },
+              selectMarcas(){
+                let me=this;
+                let marcasArray=[];
+                let header={"Token" : this.$store.state.token};
+                let configuracion= {headers : header};            
+                axios.get('marca/list',configuracion).then(function (response){
+                    marcasArray=response.data;
+                    marcasArray.map(function(x){
+                        me.marcas.push({text:x.nombre, value:x.id});
+                        console.log(me.marcas);
+                    });
+                }).catch(function(error){
+                    console.log(error);
+                });
+            },
             listar(){
                  this.ifLoad = true;
                 let me=this;
@@ -283,6 +307,7 @@
                 let configuracion= {headers : header};            
                 axios.get('articulo/list',configuracion).then(function (response){
                     me.articulos=response.data;
+                    console.log(me.articulos);
                     me.ifLoad = false;
                 }).catch(function(error){
                      this.ifLoad = false;
@@ -340,6 +365,7 @@
                         'id':this.id,
                         'categoriumId':this.categoria,
                         'codigo':this.codigo,
+                        'marcaId':this.marca,
                         'nombre':this.nombre,
                         'stock':this.stock,
                         'precio_venta':this.precio_venta,
@@ -359,6 +385,7 @@
                     {
                         'categoriumId':this.categoria,
                         'codigo':this.codigo,
+                        'marcaId':this.marca,
                         'nombre':this.nombre,
                         'stock':this.stock,
                         'precio_venta':this.precio_venta,

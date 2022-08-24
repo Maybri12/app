@@ -42,7 +42,7 @@
                                                 </td>
                                                 <td>{{ props.item.codigo }}</td>
                                                 <td>{{ props.item.nombre }}</td>
-                                                <td>{{ props.item.categoria.nombre }}</td>
+                                                <td>{{ props.item.categorium.nombre }}</td>
                                                 <td>{{ props.item.stock }}</td>
                                                 <td>{{ props.item.precio_venta }}</td>
                                                 <td>{{ props.item.descripcion }}</td>
@@ -535,8 +535,9 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};            
-                axios.get('articulo/list?valor='+this.texto,configuracion).then(function (response){
+                axios.get('articulo/listName?nombre='+this.texto,configuracion).then(function (response){
                     me.articulos=response.data;
+                    console.log(me.articulos);
                 }).catch(function(error){
                     console.log(error);
                 });
@@ -550,7 +551,6 @@
                 let configuracion= {headers : header};            
                 axios.get('venta/queryDetalles?id='+id,configuracion).then(function (response){
                     me.detalles=response.data;
-                    console.log(me.detalles);
                 }).catch(function(error){
                     console.log(error);
                 });

@@ -38,6 +38,16 @@
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
+             <v-list-tile :to="{name: 'marca'}">
+              <v-list-tile-action>
+                <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><path d="M12 3h7a2 2 0 012 2v14a2 2 0 01-2 2h-7m0-18H5a2 2 0 00-2 2v14a2 2 0 002 2h7m0-18v18"></path></svg>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                 Marcas
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
             <v-list-tile :to="{name: 'articulo'}">
               <v-list-tile-action>
                <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 01-8 0"></path></svg>
@@ -55,7 +65,7 @@
             <v-list-tile slot="activator">
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Compras
+                  Inventario
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -75,7 +85,7 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                Proveedores
+                Importadora
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -85,7 +95,7 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Representantes
+                  Proveedores
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -150,7 +160,7 @@
             <v-list-tile slot="activator">
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Consultas
+                  Reportes
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -160,7 +170,17 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Consulta Ventas
+                  Reporte Ventas
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile :to="{name: 'entradas'}">
+              <v-list-tile-action>
+                 <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><path d="M11 17.25a6.25 6.25 0 110-12.5 6.25 6.25 0 010 12.5z"></path><path d="M16 16l4.5 4.5"></path></svg>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  Reporte Compras
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -170,7 +190,7 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Consulta Ingresos
+                  Reporte Inventario
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -181,7 +201,7 @@
             <v-list-tile slot="activator">
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Bases
+                  Configuración
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -191,7 +211,7 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Materiales
+                  Configura
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>

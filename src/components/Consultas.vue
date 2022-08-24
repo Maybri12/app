@@ -100,7 +100,7 @@
                                     <tbody>
                                         <tr v-for="det in detalles" :key="det._id">
                                             <td style="text-align:center;">{{ det.cantidad }}</td>
-                                            <td>{{ det.articulo }}</td>
+                                            <td style="text-align:center;">{{ det.nombre }}</td>
                                             <td style="text-align:center;">{{ det.precio }}</td>
                                             <td style="text-align:center;">{{ det.descuento }}</td>
                                             <td style="text-align:center;">{{ (det.cantidad * det.precio) - det.descuento }}
@@ -231,8 +231,8 @@ export default {
             let me = this;
             let header = { "Token": this.$store.state.token };
             let configuracion = { headers: header };
-            axios.get('venta/query?_id=' + id, configuracion).then(function (response) {
-                me.detalles = response.data.detalles;
+            axios.get('venta/queryDetalles?id=' + id, configuracion).then(function (response) {
+                me.detalles = response.data;
             }).catch(function (error) {
                 console.log(error);
             });
@@ -243,14 +243,14 @@ export default {
             this.fecha = item.createdAt;
             this.persona = item.persona;
             this.impuesto = item.impuesto;
-            this.listarDetalles(item._id);
+            this.listarDetalles(item.id);
             this.comprobanteModal = 1;
         },
         ocultarComprobante() {
             this.comprobanteModal = 0;
         },
         limpiar() {
-            this._id = '';
+            this.id = '';
             this.impuesto = 0.12;
             this.total = 0;
             this.detalles = [];
