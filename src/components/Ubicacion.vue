@@ -2,7 +2,7 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-toolbar-title>Categorías</v-toolbar-title>
+                <v-toolbar-title>Ubicación</v-toolbar-title>
                 <v-divider class="mx-2" inset vertical></v-divider>
                 <v-spacer></v-spacer>
                 <v-text-field class="text-xs-center" v-model="search" append-icon="search" label="Búsqueda" single-line
@@ -184,7 +184,7 @@ export default {
             let me = this;
             let header = { "Token": this.$store.state.token };
             let configuracion = { headers: header };
-            axios.get('categoria/list', configuracion).then(function (response) {
+            axios.get('ubicacion/list', configuracion).then(function (response) {
                 me.categorias = response.data;
                 me.ifLoad = false;
             }).catch(function (error) {
@@ -214,7 +214,7 @@ export default {
                 if (this.editedIndex > -1) {
                 //Código para editar
                 console.log(this.nombre)
-                axios.put('categoria/update', { 'id': this.id, 'nombre': this.nombre, 'descripcion': this.descripcion }, configuracion)
+                axios.put('ubicacion/update', { 'id': this.id, 'nombre': this.nombre, 'descripcion': this.descripcion }, configuracion)
                     .then(function (response) {
                         me.limpiar();
                         me.close();
@@ -225,7 +225,7 @@ export default {
                     });
             } else {
                 //Código para guardar
-                axios.post('categoria/add', { 'nombre': this.nombre, 'descripcion': this.descripcion }, configuracion)
+                axios.post('ubicacion/add', { 'nombre': this.nombre, 'descripcion': this.descripcion }, configuracion)
                     .then(function (response) {
                         me.limpiar();
                         me.close();
@@ -277,7 +277,7 @@ export default {
             let me = this;
             let header = { "Token": this.$store.state.token };
             let configuracion = { headers: header };
-            axios.delete(`categoria/remove/${this.adId}`, {}, configuracion)
+            axios.delete(`ubicacion/remove/${this.adId}`, {}, configuracion)
                 .then(function (response) {
                     me.adModal2 = false;
                     me.adNombre = '';
@@ -292,7 +292,7 @@ export default {
             let me = this;
             let header = { "Token": this.$store.state.token };
             let configuracion = { headers: header };
-            axios.put('categoria/activate', { 'id': this.adId }, configuracion)
+            axios.put('ubicacion/activate', { 'id': this.adId }, configuracion)
                 .then(function (response) {
                     me.adModal = 0;
                     me.adAccion = 0;
@@ -308,7 +308,7 @@ export default {
             let me = this;
             let header = { "Token": this.$store.state.token };
             let configuracion = { headers: header };
-            axios.put('categoria/deactivate', { 'id': this.adId }, configuracion)
+            axios.put('ubicacion/deactivate', { 'id': this.adId }, configuracion)
                 .then(function (response) {
                     me.adModal = 0;
                     me.adAccion = 0;

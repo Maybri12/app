@@ -13,6 +13,27 @@
                 label="Búsqueda" single-line hide-details></v-text-field>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" v-if="verNuevo==0" @click="mostrarNuevo()" dark class="mb-2">Nuevo</v-btn>
+                <v-dialog v-model="adModal2" max-width="290">
+                    <v-card>
+                        <v-card-title class="headline">
+                            Eliminar Item
+                        </v-card-title>
+                       
+                        <v-card-text>
+                            Estás a punto de eliminar la categoria <b>{{adNombre}}</b> 
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn @click="activarDesactivarCerrar()" color="green darken-1" flat="flat">
+                                Cancelar
+                            </v-btn>
+                           
+                            <v-btn  @click="remove()" color="orange darken-4" flat="flat">
+                               Eliminar
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
                 <v-dialog v-model="dialog" max-width="1000px">
                     <v-card>
                         <v-card-title> 
@@ -123,7 +144,14 @@
                         >
                         check
                         </v-icon>
-                    </template>
+                    </template> &nbsp; 
+                    <v-icon
+                    small
+                    class="mr-2"
+                    @click="EliminarMostrar(props.item)"
+                    >
+                    delete
+                    </v-icon>
                 </td>
                 <td>{{ props.item.user.nombre }}</td>
                 <td>{{ props.item.persona.nombre }}</td>
@@ -149,41 +177,47 @@
             
             <v-container grid-list-sm class="pa-4 white" v-if="verNuevo">
                 <v-layout row wrap>
-                    <v-flex xs12 sm4 md4 lg4 xl4>
+                    <v-flex xs12 sm6 md6 lg6 xl6>
                         <v-select v-model="tipo_comprobante" 
                         :items="comprobantes" label="Tipo Comprobante">
                         </v-select>
+                        <p class="red--text" v-show="valida == 1">
+                             {{ validation.firstError("tipo_comprobante") }}
+                        </p>
                     </v-flex>
-                    <v-flex xs12 sm4 md4 lg4 xl4>
-                        <v-text-field v-model="serie_comprobante" label="Serie Comprobante">
-                        </v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm4 md4 lg4 xl4>
+                    
+                    <v-flex xs12 sm6 md6 lg6 xl6>
                         <v-text-field v-model="num_comprobante" label="Número Comprobante">
                         </v-text-field>
+                        <p class="red--text" v-show="valida == 1">
+                             {{ validation.firstError("num_comprobante") }}
+                        </p>
                     </v-flex>
                     <v-flex xs12 sm8 md8 lg8 xl8>
                         <v-autocomplete :items="personas" v-model="persona" label="Proveedor">
                         </v-autocomplete>
+                        <p class="red--text" v-show="valida == 1">
+                             {{ validation.firstError("persona") }}
+                        </p>
                     </v-flex>
                     <v-flex xs12 sm4 md4 lg4 xl4>
                         <v-text-field type="number" v-model="impuesto" label="Impuesto">
                         </v-text-field>
+                        <p class="red--text" v-show="valida == 1">
+                             {{ validation.firstError("impuesto") }}
+                        </p>
                     </v-flex>
                     <v-flex xs12 sm8 md8 lg8 x8>
                         <v-text-field v-model="codigo" label="Código" @keyup.enter="buscarCodigo()">
                         </v-text-field>
+                       
                     </v-flex>
                     <v-flex xs12 sm2 md2 lg2 xl2>
                         <v-btn small fab dark color="teal" @click="mostrarModalArticulos()">
                             <v-icon dark>list</v-icon>
                         </v-btn>
                     </v-flex>
-                    <v-flex xs12 sm2 md2 lg2 xl2 v-show="errorArticulo">
-                        <div class="red--text" v-text="errorArticulo">
-
-                        </div>
-                    </v-flex>
+                    
                     <v-flex xs12 sm12 md12 lg12 xl12>
                         <template>
                             <v-data-table
@@ -205,7 +239,7 @@
                                     <td class="text-xs-center">{{ props.item.nombre }}</td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.cantidad" type="number"></v-text-field></td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.precio" type="number"></v-text-field></td>
-                                    <td class="text-xs-right">$ {{ props.item.cantidad * props.item.precio}}</td>
+                                    <td class="text-xs-right">$ {{ (props.item.cantidad / props.item.precio).toFixed(2)}}</td>
                                 </template>
                                 <template slot="no-data">
                                     <h3>No hay artículos agregados al detalle.</h3>
@@ -265,7 +299,7 @@
                 personas:[],
                 tipo_comprobante:'',
                 comprobantes: ['BOLETA','FACTURA','TICKET','GUIA'],
-                serie_comprobante:'',
+                serie_comprobante:10,
                 num_comprobante: '',
                 impuesto: 0.12,
                 codigo:'',
@@ -300,7 +334,8 @@
                 adModal:0,
                 adAccion:0,
                 adNombre:'',
-                adId:''
+                adId:'',
+                adModal2 : false,
             }
         },
         computed: {
@@ -312,6 +347,31 @@
                 return resultado;
             }
         },
+        validators: { //area
+            tipo_comprobante: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+        },
+        num_comprobante: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .float()
+        },
+        persona: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+        },
+        impuesto: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .float()
+                .greaterThan(-1)
+        },
+    },
         watch: {
             dialog (val) {
             val || this.close()
@@ -447,29 +507,7 @@
                 this.validaMensaje=[];
                 this.verDetalle=0;
             },
-            validar(){
-                this.valida=0;
-                this.validaMensaje=[];
-                if(!this.persona){
-                    this.validaMensaje.push('Seleccione un proveedor.');
-                }
-                if(!this.tipo_comprobante){
-                    this.validaMensaje.push('Seleccione un tipo de comprobante.');
-                }
-                if(!this.num_comprobante){
-                    this.validaMensaje.push('Ingrese el número del comprobante.');
-                }
-                if(!this.impuesto || this.impuesto<0 || this.impuesto>1){
-                    this.validaMensaje.push('Ingrese un impuesto válido.');
-                }
-                if(this.detalles.length<=0){
-                    this.validaMensaje.push('Ingrese al menos un artículo al detalle');
-                }
-                if (this.validaMensaje.length){
-                    this.valida=1;
-                }
-                return this.valida;
-            },
+           
             mostrarNuevo(){
                 this.verNuevo=1;
             },
@@ -481,10 +519,15 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                if (this.validar()){
+                if (this.detalles.length==0){
+                    alert('Ingrese al menos un artículo al detalle');
                     return;
                 }
-                //Código para guardar
+                this.$validate().then(success => {
+                if (!success) {
+                    this.valida = 1;
+                    return;
+                }
                 axios.post('ingreso/add',
                 {
                     'personaId':this.persona,
@@ -504,6 +547,8 @@
                 .catch(function(error){
                     console.log(error);
                 });
+            });
+               
             },
             activarDesactivarMostrar(accion,item){
                 this.adModal=1;
@@ -554,7 +599,28 @@
             },
             close () {
                 this.dialog = false;
-            }
+            },
+            EliminarMostrar(item){
+                this.adModal2=true;
+                this.adNombre=item.nombre;
+                this.adId=item.id;
+                
+            },
+            remove(){
+                let me=this;
+                let header={"Token" : this.$store.state.token};
+                let configuracion= {headers : header};
+                axios.delete(`ingreso/remove/${this.adId}`,{},configuracion)
+                    .then(function(response){
+                        me.adModal2=false;
+                        me.adNombre='';
+                        me.adId='';
+                        me.listar();
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+            },
         }
     }
 </script>

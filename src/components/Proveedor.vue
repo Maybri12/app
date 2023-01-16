@@ -14,7 +14,7 @@
                 <v-spacer></v-spacer>
                 <v-dialog v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
-                        <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
+                        <v-btn color="primary" dark class="mb-2" @click="open()" v-on="on">Nuevo</v-btn>
                     </template>
                     <v-card>
                         <v-card-title>
@@ -26,40 +26,54 @@
                                 <v-flex xs12 sm12 md12>
                                     <v-text-field v-model="nombre" label="Nombre">                                        
                                     </v-text-field>
+                                    <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("nombre") }}
+                                        </p>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
                                     <v-select v-model="tipo_documento"
                                     :items="documentos" label="Tipo Documento">
                                     </v-select>
+                                    <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("tipo_documento") }}
+                                        </p>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
                                     <v-text-field v-model="num_documento" label="Número Documento">
                                     </v-text-field>
+                                    <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("num_documento") }}
+                                        </p>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
                                     <v-text-field v-model="direccion" label="Dirección">
                                     </v-text-field>
+                                    <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("direccion") }}
+                                        </p>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
                                     <v-text-field v-model="telefono" label="Teléfono">
                                     </v-text-field>
+                                    <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("telefono") }}
+                                        </p>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
                                     <v-text-field v-model="email" label="Email">
                                     </v-text-field>
+                                    <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("email") }}
+                                        </p>
                                 </v-flex>
-                                <v-flex xs12 sm12 md12 v-show="valida">
-                                    <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v">
-
-                                    </div>
-                                </v-flex>
+                              
                             </v-layout>
                         </v-container>
                         </v-card-text>            
                         <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" flat @click="close">Cancelar</v-btn>
-                        <v-btn color="blue darken-1" flat @click="guardar">Guardar</v-btn>
+                        <v-btn  color="success" flat @click="guardar">Guardar</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
@@ -218,6 +232,48 @@
             return this.editedIndex === -1 ? 'Nuevo registro' : 'Editar registro'
             }
         },
+        validators: { //area
+        nombre: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .minLength(6)
+                .maxLength(80);
+        },
+        tipo_documento: function (value) {
+            return this.$validator
+                .value(value)
+                .required();
+        },
+        num_documento: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .minLength(6)
+                .maxLength(13);
+        },
+        direccion: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .minLength(5)
+                .maxLength(50);
+        },
+        telefono: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .minLength(6)
+                .float()
+                .maxLength(10);
+        },
+        email: function (value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .email();
+        },
+    },
         watch: {
             dialog (val) {
             val || this.close()
@@ -252,34 +308,14 @@
                 this.validaMensaje=[];
                 this.editedIndex=-1;
             },
-            validar(){
-                this.valida=0;
-                this.validaMensaje=[];
-                if(this.nombre.length<1 || this.nombre.length>50){
-                    this.validaMensaje.push('El nombre de la persona debe tener entre 1-50 caracteres.');
-                }
-                if(this.num_documento.length>20){
-                    this.validaMensaje.push('El documento no debe tener más de 20 caracteres.');
-                }
-                if(this.direccion.length>70){
-                    this.validaMensaje.push('La dirección no debe tener más de 70 caracteres.');
-                }
-                if(this.telefono.length>20){
-                    this.validaMensaje.push('El teléfono no debe tener más de 20 caracteres.');
-                }
-                if(this.nombre.length>50){
-                    this.validaMensaje.push('El email del usuario debe tener menos de 50 caracteres.');
-                }
-                if (this.validaMensaje.length){
-                    this.valida=1;
-                }
-                return this.valida;
-            },
+        
             guardar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                if (this.validar()){
+                this.$validate().then(success => {
+                if (!success) {
+                    this.valida = 1;
                     return;
                 }
                 if (this.editedIndex >-1){
@@ -323,8 +359,16 @@
                         console.log(error);
                     });
                 }
+            });
+                
             },
+            open(){
+            this.valida = 0;
+            this.dialog = true;
+            this.limpiar()
+        },
             editItem (item) {
+                this.valida = 0;
                 this.id=item.id;
                 this.rol=item.rol;
                 this.nombre=item.nombre;

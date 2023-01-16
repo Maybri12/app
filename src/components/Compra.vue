@@ -404,7 +404,7 @@
                 this.tipo_comprobante='';
                 this.serie_comprobante='';
                 this.num_comprobante='';
-                this.impuesto=0.18;
+                this.impuesto=0.12;
                 this.codigo='';
                 this.total=0;
                 this.totalParcial=0;

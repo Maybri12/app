@@ -1,7 +1,7 @@
 <template>
     <v-layout align-start>
         <v-flex>
-            <v-container grid-list-sm class="white">
+            <v-container grid-list-sm class="white" ref="contentt">
                 <v-layout row wrap>
                     <v-flex xs12 sm5 md5 lg5 x5>
                         <v-dialog ref="dialog" v-model="modal" :return-value.sync="date" persistent width="290px">

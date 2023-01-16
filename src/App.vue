@@ -48,13 +48,23 @@
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
+            <v-list-tile :to="{name: 'ubicacion'}">
+              <v-list-tile-action>
+                <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><path d="M12 3h7a2 2 0 012 2v14a2 2 0 01-2 2h-7m0-18H5a2 2 0 00-2 2v14a2 2 0 002 2h7m0-18v18"></path></svg>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                 Ubicación
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
             <v-list-tile :to="{name: 'articulo'}">
               <v-list-tile-action>
                <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 01-8 0"></path></svg>
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Artículos
+                  Productos
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -229,7 +239,7 @@
     >
       <v-toolbar-title style="width: 250px;  " class="ml-0 ">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <span class="hidden-sm-and-down">Créditos <b style="color:#e5322d">BRYAN</b> </span>
+        <span class="hidden-sm-and-down">CREDITOS BRIAN </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn @click="salir()" style="color:#e5322d" icon v-if="logueado">

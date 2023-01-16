@@ -14,7 +14,7 @@
                 <v-spacer></v-spacer>
                 <v-dialog v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
-                        <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
+                        <v-btn color="primary" dark class="mb-2" @click="open()" v-on="on">Nuevo</v-btn>
                     </template>
                     <v-card>
                         <v-card-title>
@@ -26,14 +26,10 @@
                                 <v-flex xs12 sm12 md12>
                                     <v-text-field v-model="nombre" label="Nombre"></v-text-field>
                                 </v-flex>
-                                <v-flex xs12 sm12 md12>
-                                    <v-text-field v-model="descripcion" label="Descripción"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm12 md12 v-show="valida">
-                                    <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v">
-
-                                    </div>
-                                </v-flex>
+                                <p class="red--text" v-show="valida ==1">
+                                       {{ validation.firstError("nombre") }}
+                                     </p>
+                                
                             </v-layout>
                         </v-container>
                         </v-card-text>            
@@ -133,7 +129,7 @@
                     </v-icon>
                 </td>
                 <td>{{ props.item.nombre }}</td>
-                <td>{{ props.item.descripcion }}</td>
+                <td>{{ props.item.createdAt.substring(0, 10) }}</td>
                 <td>
                     <div v-if="props.item.estado">
                         <span class="blue--text">Activo</span>
@@ -165,7 +161,7 @@
                 headers: [
                     { text: 'Opciones', value: 'opciones', sortable: false },
                     { text: 'Nombre', value: 'nombre', sortable: true },
-                    { text: 'Descripción', value: 'descripcion', sortable: false },
+                    { text: 'Fecha', value: 'createdAt', sortable: false },
                     { text: 'Estado', value: 'estado', sortable: false },
                 ],
                 editedIndex: -1,
@@ -186,6 +182,16 @@
             return this.editedIndex === -1 ? 'Nuevo registro' : 'Editar registro'
             }
         },
+        validators: { //area
+        nombre : function(value) {
+            return this.$validator
+                .value(value)
+                .required()
+                .minLength(3)
+                .maxLength(80);
+        },
+
+    },
         watch: {
             dialog (val) {
             val || this.close()
@@ -216,25 +222,14 @@
                 this.validaMensaje=[];
                 this.editedIndex=-1;
             },
-            validar(){
-                this.valida=0;
-                this.validaMensaje=[];
-                if(this.nombre.length<1 || this.nombre.length>50){
-                    this.validaMensaje.push('El nombre de la categoría debe tener entre 1-50 caracteres.');
-                }
-                if(this.descripcion.length>255){
-                    this.validaMensaje.push('La descripción de la categoría no debe tener más de 255 caracteres.');
-                }
-                if (this.validaMensaje.length){
-                    this.valida=1;
-                }
-                return this.valida;
-            },
+
             guardar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                if (this.validar()){
+                this.$validate().then(success => {
+                if (!success) {
+                    this.valida = 1;
                     return;
                 }
                 if (this.editedIndex >-1){
@@ -261,9 +256,16 @@
                         console.log(error);
                     });
                 }
+            })
+              
             },
+            open(){
+            this.valida = 0;
+            this.dialog = true;
+        },
             editItem (item) {
                 this.id=item.id;
+                this.valida = 0;
                 this.nombre=item.nombre;
                 this.descripcion=item.descripcion;
                 this.dialog = true;
