@@ -385,8 +385,7 @@
             selectPersona(){
                 let me=this;
                 let personaArray=[];
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};            
+                let configuracion = { headers: {'x-access-token': this.$store.state.token,} };           
                 axios.get('persona/listProveedores',configuracion).then(function (response){
                     personaArray=response.data;
                     personaArray.map(function(x){
@@ -517,8 +516,7 @@
             },
             guardar(){
                 let me=this;
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};
+                let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Compra'} }; 
                 if (this.detalles.length==0){
                     alert('Ingrese al menos un artículo al detalle');
                     return;
@@ -608,9 +606,8 @@
             },
             remove(){
                 let me=this;
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};
-                axios.delete(`ingreso/remove/${this.adId}`,{},configuracion)
+                let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Compra'} }; 
+                axios.delete(`ingreso/remove/${this.adId}`,configuracion)
                     .then(function(response){
                         me.adModal2=false;
                         me.adNombre='';

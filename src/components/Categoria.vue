@@ -182,8 +182,7 @@ export default {
         listar() {
             this.ifLoad = true;
             let me = this;
-            let header = { "Token": this.$store.state.token };
-            let configuracion = { headers: header };
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Listas Categorias'} };
             axios.get('categoria/list', configuracion).then(function (response) {
                 me.categorias = response.data;
                 me.ifLoad = false;
@@ -203,17 +202,13 @@ export default {
 
         guardar() {
             let me = this;
-            let header = { "Token": this.$store.state.token };
-            let configuracion = { headers: header };
-
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Categoria'} };
             this.$validate().then(success => {
                 if (!success) {
                     this.valida = 1;
                     return;
                 }
                 if (this.editedIndex > -1) {
-                //Código para editar
-                console.log(this.nombre)
                 axios.put('categoria/update', { 'id': this.id, 'nombre': this.nombre, 'descripcion': this.descripcion }, configuracion)
                     .then(function (response) {
                         me.limpiar();
@@ -275,9 +270,8 @@ export default {
         },
         remove() {
             let me = this;
-            let header = { "Token": this.$store.state.token };
-            let configuracion = { headers: header };
-            axios.delete(`categoria/remove/${this.adId}`, {}, configuracion)
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Categoria'} };
+            axios.delete(`categoria/remove/${this.adId}`,  configuracion)
                 .then(function (response) {
                     me.adModal2 = false;
                     me.adNombre = '';

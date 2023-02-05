@@ -68,11 +68,13 @@ export default {
                 return respuesta.data;
             })
             .then(data =>{
+                console.log(data.user);
                 this.$store.dispatch("guardarToken",data.tokenReturn);
                 this.$router.push({name: 'home'});
+                localStorage.setItem("Xf", JSON.stringify(data.user));
             })
             .catch(error =>{
-                //console.log(eror);
+                console.log(eror);
                 this.errorM=null;
                 if (error.response.status==404){
                     this.errorM='No existe el usuario o las credenciales son incorrectas.';
@@ -82,7 +84,7 @@ export default {
             });
         },
         reset(){
-            axios.post('usuario/reset',{email: this.email2})
+            axios.post('auth/pws',{email: this.email2})
             .then(respuesta =>{
                 return respuesta.data;
             })

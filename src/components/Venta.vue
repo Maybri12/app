@@ -56,14 +56,7 @@
                                                     <td>{{ props.item.stock }}</td>
                                                     <td>{{ props.item.precio_venta }}</td>
                                                     <td>{{ props.item.descripcion }}</td>
-                                                    <td>
-                                                        <div v-if="props.item.estado">
-                                                            <span class="blue--text">Activo</span>
-                                                        </div>
-                                                        <div v-else>
-                                                            <span class="red--text">Inactivo</span>
-                                                        </div>
-                                                    </td>
+                                                    
                                                 </template>
                                             </v-data-table>
                                         </template>
@@ -113,13 +106,13 @@
                             <div id="factura">
                                 <header>
                                     <div id="logo">
-                                        <img src="../assets/boletin-272.jpg" id="imagen">
+                                        <img src="../assets/img/image.jpg" id="imagen">
                                     </div>
                                     <div id="datos">
                                         <p id="encabezado">
-                                            <b>Almacen</b>
-                                            <br>José Gálvez 1368, Chongoyape
-                                            Ecuador<br>Telefono:(+593)931742904<br>Email:admin@gmail.com
+                                            <b>CRÉDITOS BRYAN</b>
+                                            <br>AV. CAMILO PONCE Y 27 DE NOVIEMBRE,SAN LORENZO
+                                            <br>0994943265 - 2781691<br>creditos_miriam@hotmail.com
                                         </p>
                                     </div>
                                     <div id="fact">
@@ -247,12 +240,7 @@
                     <td>{{ props.item.createdAt.substring(0, 10) }}</td>
                     <td>{{ props.item.impuesto }}</td>
                     <td>{{ props.item.total }}</td>
-                    <td>
-                        <div @click="emitir(props.item)">
-                            <span class="blue--text">Emitir factura</span>
-                        </div>
-
-                    </td>
+                   
                 </template>
                 <template v-slot:no-data>
                     <v-btn color="primary" @click="listar()">Resetear</v-btn>
@@ -374,7 +362,6 @@ export default {
                 { text: 'Fecha', value: 'createdAt', sortable: false },
                 { text: 'Impuesto', value: 'impuesto', sortable: false },
                 { text: 'Total', value: 'total', sortable: false },
-                { text: 'Estado', value: 'estado', sortable: false }
             ],
             id: '',
             persona: '',
@@ -409,7 +396,6 @@ export default {
                 { text: 'Stock', value: 'stock', sortable: false },
                 { text: 'Precio Venta', value: 'precio_venta', sortable: false },
                 { text: 'Descripción', value: 'descripcion', sortable: false },
-                { text: 'Estado', value: 'estado', sortable: false }
             ],
             verDetalle: 0,
             valida: 0,
@@ -473,8 +459,7 @@ export default {
         },
         listarProductosDetalles(id) {
             let me = this;
-            let header = { "Token": this.$store.state.token };
-            let configuracion = { headers: header };
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Venta'} };
             axios.get('venta/queryDetalles?id=' + id, configuracion).then(function (response) {
                 me.detalles = response.data;
             }).catch(function (error) {
@@ -654,8 +639,7 @@ export default {
         },
         guardar() {
             let me = this;
-            let header = { "Token": this.$store.state.token };
-            let configuracion = { headers: header };
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Venta'} };
             if (this.detalles.length == 0) {
                 alert('Ingrese al menos un artículo al detalle');
                 return;
@@ -745,9 +729,8 @@ export default {
         },
         remove() {
             let me = this;
-            let header = { "Token": this.$store.state.token };
-            let configuracion = { headers: header };
-            axios.delete(`venta/remove/${this.adId}`, {}, configuracion)
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Venta'} };
+            axios.delete(`venta/remove/${this.adId}`,  configuracion)
                 .then(function (response) {
                     me.adModal2 = false;
                     me.adNombre = '';

@@ -49,7 +49,7 @@
                 <v-btn @click="crearPDF()">
                     <v-icon>print</v-icon>
                 </v-btn>
-                Suma total de Compras en corte : $ {{ totalVenta = ventasTotal }}
+                
                 <v-data-table :headers="headers" :items="inventario" :search="search">
                     <template v-slot:items="props">
                        
@@ -134,7 +134,7 @@ export default {
                 { text: 'Articulo', value: 'nombre', sortable: true },
                 { text: 'Salidas', value: 'persona.nombre', sortable: true },
                 { text: 'Entradas', value: 'tipo_comprobante', sortable: true },
-                { text: 'Stok', value: 'createdAt', sortable: false },,
+                { text: 'Existencia', value: 'createdAt', sortable: false },,
             ],
             detalles: [],
             comprobanteModal: 0,
@@ -190,7 +190,6 @@ export default {
                     this.search = result[0].text;
                     this.sto = result[0].stock;
                     this.buscarCodigo();
-
                 } else {
                     alert('error')
                 }
@@ -204,11 +203,9 @@ export default {
             axios.get('ingreso/consultaFechas?start=' + this.date + '&end=' + this.date2, configuracion).then(function (response) {
                 console.log(response.data);
                 me.algotirmoJhoin(response.data)
-
             }).catch(function (error) {
                 console.log(error);
             });
-
         },
         algotirmoJhoin(obj) {
             let ventas = obj.ventas
@@ -245,47 +242,43 @@ export default {
         },
         crearPDF() {
             var columns = [
-                { title: "Responsable", dataKey: "responsable" },
-                { title: "Proveedor", dataKey: "proveedor" },
-                { title: "Comprobante", dataKey: "comprobante" },
-                { title: "Total", dataKey: "total" }
+                { title: "Articulo", dataKey: "nombre" },
+                { title: "Entrada", dataKey: "entradas" },
+                { title: "Salida", dataKey: "cantidad" },
+                { title: "Existencia", dataKey: "strok" },
+                
             ];
             var rows = [];
-
-            this.ventas.map(function (x) {
+            this.inventario.map(function (x) {
                 rows.push(
                     {
-                        responsable: x.usuario.nombre,
-                        proveedor: x.persona.nombre,
-                        comprobante: x.tipo_comprobante,
-                        total: x.total
+                        nombre: x.nombre,
+                        entradas: x.entradas,
+                        cantidad: x.cantidad,
+                        strok: x.strok,
+                       
                     }
                 );
             });
             var doc = new jsPDF('p', 'pt');
-            let total = this.totalVenta
             let start = this.date
             let end = this.date2
             doc.autoTable(columns, rows, {
                 margin: { top: 120 },
                 addPageContent: function (data) {
-                    doc.text("Reporte de compras", 250, 30);
+                    doc.text("Reporte de inventario", 250, 30);
                     doc.text("Fecha inicio : " + start, 40, 60);
                     doc.text("Fecha final  : " + end, 40, 85);
-                    doc.text("Total compras : $" + total, 40, 110);
                 }
             });
-
             doc.save('corte' + this.date + this.date2 + '.pdf');
         },
         listarDetalles(item) {
             this.detalles = item.detalles;
             console.log(this.detalles);
-
         },
         mostrarComprobante(item) {
             this.limpiar();
-
             this.fecha = item.createdAt;
             this.persona = item.persona;
             this.impuesto = item.impuesto;

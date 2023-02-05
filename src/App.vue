@@ -206,6 +206,28 @@
             </v-list-tile>
           </v-list-group>
         </template>   
+        <template v-if="esAdministrador || esAlmacenero ">
+          <v-list-group>
+            <v-list-tile slot="activator">
+              <v-list-tile-content>
+                <v-list-tile-title>
+                 Kardex
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile :to="{name: 'kardex'}">
+              <v-list-tile-action>
+               <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><circle cx="12" cy="12" r="4"></circle><path d="M1.05 12H7"></path><path d="M17.01 12h5.95"></path></svg>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  Kardex 
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+           
+          </v-list-group>
+        </template> 
           <template v-if="esAdministrador || esAlmacenero || esVendedor">
           <v-list-group>
             <v-list-tile slot="activator">
@@ -228,6 +250,28 @@
            
           </v-list-group>
         </template>   
+        <template v-if="esAdministrador || esAlmacenero || esVendedor">
+          <v-list-group>
+            <v-list-tile slot="activator">
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  Módulo auditoria
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile :to="{name: 'auditoria'}">
+              <v-list-tile-action>
+               <svg data-testid="geist-icon" fill="none" height="19" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="19"><circle cx="12" cy="12" r="4"></circle><path d="M1.05 12H7"></path><path d="M17.01 12h5.95"></path></svg>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  Auditorias
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+           
+          </v-list-group>
+        </template> 
       </v-list>
     </v-navigation-drawer>
     <v-toolbar

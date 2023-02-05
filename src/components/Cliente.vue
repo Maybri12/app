@@ -24,7 +24,7 @@
                         <v-container grid-list-md>
                             <v-layout wrap>
                                 <v-flex xs12 sm12 md12>
-                                    <v-text-field v-model="nombre" label="Nombre">                                        
+                                    <v-text-field v-model="nombre" label=" Apellidos y Nombres">                                        
                                     </v-text-field>
                                     <p class="red--text" v-show="valida == 1">
                                         {{ validation.firstError("nombre") }}
@@ -39,8 +39,9 @@
                                     </p>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="num_documento" label="Número Documento">
+                                    <v-text-field @change="ifCedula($event)" v-model="num_documento" label="Número Documento">
                                     </v-text-field>
+                                    <p v-if="resulta!=''" class="red--text">{{ resulta }}</p>
                                     <p class="red--text" v-show="valida == 1">
                                         {{ validation.firstError("num_documento") }}
                                     </p>
@@ -189,6 +190,8 @@
 <script>
     import axios from 'axios'
     import Spinner from '../layout/Spinner.vue'
+    import Validacedula from "../services/validacedula.js";
+     const ResultService = new Validacedula();
     export default {
         components :{Spinner},
         data(){
@@ -211,7 +214,7 @@
                 nombre:'',
                 tipo_persona:'Cliente',
                 tipo_documento:'',
-                documentos: ['DNI','RUC','PASAPORTE','CEDULA'],
+                documentos: ['RUC','CEDULA'],
                 num_documento: '',
                 direccion: '',
                 telefono: '',
@@ -222,7 +225,8 @@
                  adModal2:false,
                 adAccion:0,
                 adNombre:'',
-                adId:''
+                adId:'',
+                resulta : ""
             }
         },
         computed: {
@@ -281,11 +285,16 @@
             this.listar()
         },
         methods: {
+            ifCedula(event) {
+  
+      if (event.length > 8) {
+        this.resulta = ResultService.ifCedula(event)
+      }
+    },
             listar(){
                  this.ifLoad = true;
                 let me=this;
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};            
+                let configuracion = { headers: {'x-access-token': this.$store.state.token,} };           
                 axios.get('persona/listClientes',configuracion).then(function (response){
                     me.personas=response.data;
                      me.ifLoad = false;
@@ -309,8 +318,7 @@
            
             guardar(){
                 let me=this;
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};
+                let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Cliente'} };  
                 this.$validate().then(success => {
                 if (!success) {
                     this.valida = 1;
@@ -403,8 +411,7 @@
             },
              remove(){
                 let me=this;
-                let header={"Token" : this.$store.state.token};
-                let configuracion= {headers : header};
+                let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Cliente'} }; 
                 axios.delete(`persona/remove/${this.adId}`,{},configuracion)
                     .then(function(response){
                         me.adModal2=false;

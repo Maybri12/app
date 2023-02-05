@@ -18,7 +18,8 @@ import ConsultaIngresos from './components/ConsultaIngresos.vue'
 import Marca from './components/Marca.vue'
 import Entradas from './components/Entradas.vue'
 import Ubicacion from './components/Ubicacion.vue'
-
+import kardex from './components/Kardex.vue'
+import Auditoria from './components/Auditoria.vue'
 
 Vue.use(Router)
 
@@ -145,6 +146,22 @@ var router = new Router({
       path: '/consultasIngreso',
       name: 'consultasIngreso',
       component: ConsultaIngresos,
+      meta: {
+        administrador: true
+      }
+    },
+    {
+      path: '/kardex',
+      name: 'kardex',
+      component: kardex,
+      meta: {
+        administrador: true
+      }
+    },
+    {
+      path: '/auditoria',
+      name: 'auditoria',
+      component: Auditoria,
       meta: {
         administrador: true
       }
