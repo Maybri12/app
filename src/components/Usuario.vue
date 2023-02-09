@@ -110,22 +110,15 @@
                     >
                     edit
                     </v-icon>
-                    <template v-if="props.item.estado">
-                        <v-icon
-                        small
-                        @click="activarDesactivarMostrar(2,props.item)"
-                        >
-                        block
-                        </v-icon>
-                    </template>
-                    <template v-else>
-                        <v-icon
-                        small
-                        @click="activarDesactivarMostrar(1,props.item)"
-                        >
-                        check
-                        </v-icon>
-                    </template>
+                    <v-icon
+                    small
+                    class="mr-2"
+                    @click="remove(props.item.id)"
+                    >
+                    delete
+                    </v-icon>
+               
+                 
                 </td>
                 <td>{{ props.item.nombre }}</td>
                 <td>{{ props.item.num_documento }}</td>
@@ -225,6 +218,7 @@
             validar(){
                 this.valida=0;
                 this.validaMensaje=[];
+                console.log(this.rol)
                 if(!this.rol){
                     this.validaMensaje.push('Seleccione un rol.');
                 }
@@ -262,7 +256,8 @@
                     //Código para editar
                     axios.put('usuario/update',{
                         'id':this.id,
-                        'rol':this.rol,
+                        'username':this.num_documento,
+                        'roles':[this.rol],
                         'nombre':this.nombre,
                         'tipo_documento':this.tipo_documento,
                         'num_documento':this.num_documento,
@@ -281,9 +276,10 @@
                     });
                 }else{
                     //Código para guardar
-                    axios.post('usuario/add',
+                    axios.post('auth/signup',
                     {
-                        'rol':this.rol,
+                        'roles':[this.rol],
+                        'username':this.num_documento,
                         'nombre':this.nombre,
                         'tipo_documento':this.tipo_documento,
                         'num_documento':this.num_documento,
@@ -334,7 +330,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('usuario/activate',{'id':this.adId},configuracion)
+                axios.delete('usuario/remove',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -350,7 +346,7 @@
                 let me=this;
                 let header={"Token" : this.$store.state.token};
                 let configuracion= {headers : header};
-                axios.put('usuario/deactivate',{'id':this.adId},configuracion)
+                axios.delete('usuario/remove',{'id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -362,6 +358,20 @@
                         console.log(error);
                     });
             },
+            remove(id) {
+            let me = this;
+            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Articulo'} };
+            axios.delete(`usuario/remove/${id}`,  configuracion)
+                .then(function (response) {
+                    me.adModal2 = false;
+                    me.adNombre = '';
+                    me.adId = '';
+                    me.listar();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
             close () {
                 this.dialog = false;
             }

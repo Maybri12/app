@@ -1,7 +1,7 @@
 export default class Functions {
 
     ifCedula(cedula){
-        if (cedula.length == 10) {
+        if (cedula.length > 5) {
             var digito_region = cedula.substring(0, 2);
             if (digito_region >= 1 && digito_region <= 24) {
               var ultimo_digito = cedula.substring(9, 10);

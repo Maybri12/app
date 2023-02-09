@@ -52,16 +52,16 @@
                                 <th>Fecha</th>
                                 <th>Detalle</th>
                                 <th></th>
-                                <th>V. compra</th>
-                                <th>Cant</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
                                 <th>Total</th>
                                 <th></th>
-                                <th>V. venta</th>
-                                <th>Cant</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
                                 <th>Total</th>
                                 <th></th>
-                                <th>Valor</th>
-                                <th>Cant</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
                                 <th>Total</th>
                             </tr>
                         </thead>
@@ -70,18 +70,19 @@
                                 <td>{{ item.fecha.substring(0, 10) }}</td>
                                 <td>{{ item.detalle }}</td>
                                 <td> <b> |</b> </td>
-                                <td> <span v-if="item.estado == '0'">{{ item.precio }}</span> </td>
                                 <td> <span v-if="item.estado == '0'"> {{ item.cantidad }}</span></td>
+                                <td> <span v-if="item.estado == '0'">{{ item.precio }}</span> </td>
                                 <td> <span v-if="item.estado == '0'">{{ item.total }}</span> </td>
                                 <td> <b> |</b> </td>
-                                <td><span v-if="item.estado == '1'">{{ item.precio }}</span> </td>
                                 <td> <span v-if="item.estado == '1'">{{ item.cantidad }}</span> </td>
+                                <td><span v-if="item.estado == '1'">{{ item.precio }}</span> </td>
                                 <td> <span v-if="item.estado == '1'">{{ item.total }}</span> </td>
                                 <td> <b> |</b> </td>
-                                <td> <span>{{ item.precio }}</span> </td>
+                                
                                 <td> 
                                     <span> {{ item.saldoCantidad }}</span>
                                 </td>
+                                <td> <span>{{ item.precio }}</span> </td>
                                 <td> <span>{{ item.saldoTotal }}</span> </td>
                             </tr>
 
@@ -236,7 +237,7 @@ export default {
                 precio: precioInventarioInicial,
                 total: precioTotalInicial,
                 estado: '2',
-                fecha: '2021-01-03 19:59:43.425-05',
+                fecha: '2023-01-01 19:59:43.425-05',
                 detalle: 'INVENTARIO INICIAL',
                 saldoCantidad : stokInicial,
                 saldoTotal : precioTotalInicial,

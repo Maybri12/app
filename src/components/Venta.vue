@@ -56,7 +56,7 @@
                                                     <td>{{ props.item.stock }}</td>
                                                     <td>{{ props.item.precio_venta }}</td>
                                                     <td>{{ props.item.descripcion }}</td>
-                                                    
+
                                                 </template>
                                             </v-data-table>
                                         </template>
@@ -156,10 +156,11 @@
                                                 <tr v-for="det in detalles" :key="det._id">
                                                     <td style="text-align:center;">{{ det.cantidad }}</td>
                                                     <td style="text-align:center;">{{ det.nombre }}</td>
-                                                    <td style="text-align:right;">{{ det.precio }}</td>
+                                                    <td style="text-align:right;">{{ (det.precio / 1.12).toFixed(2) }}
+                                                    </td>
                                                     <td style="text-align:right;">{{ det.descuento }}</td>
                                                     <td style="text-align:right;">
-                                                        {{ (det.cantidad * det.precio) - det.descuento }}</td>
+                                                        {{ ((det.cantidad * det.precio) / 1.12).toFixed(2) }}</td>
                                                 </tr>
                                             </tbody>
                                             <tfoot>
@@ -169,7 +170,7 @@
                                                     <th></th>
                                                     <th style="text-align:right;">SUBTOTAL</th>
                                                     <th style="text-align:right;">$
-                                                        {{ totalParcial = (total - totalImpuesto).toFixed(2) }}</th>
+                                                        {{ totalParcial = (total / 1.12).toFixed(2) }}</th>
                                                 </tr>
                                                 <tr>
                                                     <th></th>
@@ -178,8 +179,7 @@
                                                     <th style="text-align:right;">IVA({{ impuesto }}%)</th>
                                                     <th style="text-align:right;">$
                                                         {{
-                                                            totalImpuesto = ((total * impuesto) / (1 +
-                                                                impuesto)).toFixed(2)
+                                                            totalImpuesto = (total - totalParcial).toFixed(2)
                                                         }}
                                                     </th>
                                                 </tr>
@@ -236,11 +236,10 @@
                     <td>{{ props.item.user.nombre }}</td>
                     <td>{{ props.item.persona.nombre }}</td>
                     <td>{{ props.item.tipo_comprobante }}</td>
-                    <td>{{ props.item.num_comprobante }}</td>
+                    <td>001-001-00000{{ props.item.num_comprobante }}</td>
                     <td>{{ props.item.createdAt.substring(0, 10) }}</td>
-                    <td>{{ props.item.impuesto }}</td>
                     <td>{{ props.item.total }}</td>
-                   
+
                 </template>
                 <template v-slot:no-data>
                     <v-btn color="primary" @click="listar()">Resetear</v-btn>
@@ -257,26 +256,30 @@
                     </v-flex>
 
                     <v-flex xs12 sm6 md6 lg6 xl6>
-                        <v-text-field v-model="num_comprobante" label="Número Comprobante">
-                        </v-text-field>
-                        <p class="red--text" v-show="valida == 1">
-                            {{ validation.firstError("num_comprobante") }}
-                        </p>
+                        <p>No. 001-001-00000{{  num_comprobante}}</p>
+                        
                     </v-flex>
-                    <v-flex xs12 sm8 md8 lg8 xl8>
-                        <v-autocomplete :items="personas" v-model="persona" label="Cliente">
-                        </v-autocomplete>
-                        <p class="red--text" v-show="valida == 1">
-                            {{ validation.firstError("persona") }}
-                        </p>
-                    </v-flex>
-                    <v-flex xs12 sm4 md4 lg4 xl4>
+                    <v-flex xs12 sm3 md3 lg4 xl3>
                         <v-text-field type="number" v-model="impuesto" label="Impuesto">
                         </v-text-field>
                         <p class="red--text" v-show="valida == 1">
                             {{ validation.firstError("impuesto") }}
                         </p>
                     </v-flex>
+                    <v-flex xs12 sm6 md6 lg6 xl6>
+                        <v-autocomplete :items="personas" v-model="persona" label="Cliente">
+                        </v-autocomplete>
+                        <p class="red--text" v-show="valida == 1">
+                            {{ validation.firstError("persona") }}
+                        </p>
+
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 lg2 xl2>
+                        <v-btn small fab dark color="teal" @click="mostrarCliente()">
+                            <v-icon dark> add</v-icon>
+                        </v-btn>
+                    </v-flex>
+
                     <v-flex xs12 sm8 md8 lg8 x8>
                         <v-text-field v-model="codigo" label="Código" @keyup.enter="buscarCodigo()">
                         </v-text-field>
@@ -338,7 +341,72 @@
                         <v-btn color="blue darken-1" flat @click.native="ocultarNuevo()">Cancelar</v-btn>
                         <v-btn color="success" v-if="verDetalle == 0" @click.native="guardar()">Guardar</v-btn>
                     </v-flex>
+
                 </v-layout>
+                <v-dialog v-model="dialog100" max-width="500px">
+
+                    <v-card>
+                        <v-card-title>
+                            <span class="headline">Crear Cliente</span>
+                        </v-card-title>
+                        <v-card-text>
+                            <v-container grid-list-md>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm12 md12>
+                                        <v-text-field v-model="nombre" label=" Apellidos y Nombres">
+                                        </v-text-field>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("nombre") }}
+                                        </p>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-select v-model="tipo_documento" :items="documentos" label="Tipo Documento">
+                                        </v-select>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("tipo_documento") }}
+                                        </p>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field @change="ifCedula($event)" v-model="num_documento"
+                                            label="Número Documento">
+                                        </v-text-field>
+                                        <p v-if="resulta != ''" class="red--text">{{ resulta }}</p>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("num_documento") }}
+                                        </p>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field v-model="direccion" label="Dirección">
+                                        </v-text-field>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("direccion") }}
+                                        </p>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field v-model="telefono" label="Teléfono">
+                                        </v-text-field>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("telefono") }}
+                                        </p>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field v-model="email" label="Email" >
+                                        </v-text-field>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("email") }}
+                                        </p>
+                                    </v-flex>
+
+                                </v-layout>
+                            </v-container>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="blue darken-1" flat @click="close2">Cancelar</v-btn>
+                            <v-btn color="blue darken-1" flat @click="guardar2">Guardar</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             </v-container>
         </v-flex>
     </v-layout>
@@ -347,6 +415,8 @@
 import axios from 'axios'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas';
+import Validacedula from "../services/validacedula.js";
+const ResultService = new Validacedula();
 export default {
     data() {
         return {
@@ -360,16 +430,15 @@ export default {
                 { text: 'Tipo Comprobante', value: 'tipo_comprobante', sortable: true },
                 { text: 'Num compro.', value: 'num_comprobante', sortable: false },
                 { text: 'Fecha', value: 'createdAt', sortable: false },
-                { text: 'Impuesto', value: 'impuesto', sortable: false },
                 { text: 'Total', value: 'total', sortable: false },
             ],
             id: '',
             persona: '',
             personas: [],
             tipo_comprobante: '',
-            comprobantes: ['BOLETA', 'FACTURA', 'TICKET', 'GUIA'],
-            serie_comprobante: 10,
-            num_comprobante: '',
+            comprobantes: ['FACTURA', 'GUIA'],
+            serie_comprobante: 0,
+            num_comprobante: 0,
             impuesto: 0.12,
             codigo: '',
             cabeceraDetalles: [
@@ -406,7 +475,17 @@ export default {
             adId: '',
             comprobanteModal: 0,
             fecha: null,
-            adModal2: false
+            adModal2: false,
+            dialog100: false,
+            nombre: '',
+            tipo_persona: 'Cliente',
+            tipo_documento: '',
+            documentos: ['CEDULA','RUC'],
+            num_documento: '',
+            direccion: '',
+            telefono: '',
+            email: '',
+            resulta: '',
         }
     },
     computed: {
@@ -446,20 +525,67 @@ export default {
     watch: {
         dialog(val) {
             val || this.close()
-        }
+        },
+
     },
     created() {
         this.listar();
         this.selectPersona();
     },
     methods: {
+        ifCedula(event) {
+            if (event.length > 5) {
+                this.resulta = ResultService.ifCedula(event)
+            }
+        },
+        guardar2(){
+            if ( this.nombre=='' &&this.num_documento=='' &&this.telefono=='' &&this.email=='') return
+                let me=this;
+                let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Cliente'} };  
+
+                    //Código para guardar
+                    axios.post('persona/add',
+                    {
+                        'tipo_persona':this.tipo_persona,
+                        'nombre':this.nombre,
+                        'tipo_documento':this.tipo_documento,
+                        'num_documento':this.num_documento,
+                        'direccion':this.direccion,
+                        'telefono': this.telefono,
+                        'email':this.email
+                    },configuracion)
+                    .then(function(response){
+                        me.limpiar2();
+                        me.close2();
+                        me.selectPersona();
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+            },
+            limpiar2(){
+                this.nombre='';
+                this.num_documento='';
+                this.direccion='';
+                this.telefono='';
+                this.email='';
+                this.valida=0;
+                this.validaMensaje=[];
+                this.editedIndex=-1;
+            },
+        mostrarCliente() {
+            this.dialog100 = true;
+        },
+        close2() {
+            this.dialog100 = false;
+        },
         async emitir(obj) {
             console.log(obj);
 
         },
         listarProductosDetalles(id) {
             let me = this;
-            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Venta'} };
+            let configuracion = { headers: { 'x-access-token': this.$store.state.token, 'options': 'Agrego Venta' } };
             axios.get('venta/queryDetalles?id=' + id, configuracion).then(function (response) {
                 me.detalles = response.data;
             }).catch(function (error) {
@@ -608,6 +734,15 @@ export default {
             let configuracion = { headers: header };
             axios.get('venta/list', configuracion).then(function (response) {
                 me.ventas = response.data;
+                me.num_comprobante = 1
+                if (me.ventas.length > 0) {
+                    for (let i = 0; i < me.ventas.length; i++) {
+                        const element = me.ventas[i];
+                        me.num_comprobante = parseInt(element.num_comprobante) +1
+                    }
+                }
+                console.log(me.ventas);
+                console.log(me.num_comprobante);
             }).catch(function (error) {
                 console.log(error);
             });
@@ -639,7 +774,7 @@ export default {
         },
         guardar() {
             let me = this;
-            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Venta'} };
+            let configuracion = { headers: { 'x-access-token': this.$store.state.token, 'options': 'Agrego Venta' } };
             if (this.detalles.length == 0) {
                 alert('Ingrese al menos un artículo al detalle');
                 return;
@@ -650,26 +785,26 @@ export default {
                     return;
                 }
                 axios.post('venta/add',
-                {
-                    'personaId': this.persona,
-                    'userId': this.$store.state.usuario.id,
-                    'tipo_comprobante': this.tipo_comprobante,
-                    'serie_comprobante': this.serie_comprobante,
-                    'num_comprobante': this.num_comprobante,
-                    'impuesto': this.impuesto,
-                    'total': this.total,
-                    'detalles': this.detalles
-                }, configuracion)
-                .then(function (response) {
-                    me.limpiar();
-                    me.close();
-                    me.listar();
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                    {
+                        'personaId': this.persona,
+                        'userId': this.$store.state.usuario.id,
+                        'tipo_comprobante': this.tipo_comprobante,
+                        'serie_comprobante': this.serie_comprobante,
+                        'num_comprobante': this.num_comprobante,
+                        'impuesto': this.impuesto,
+                        'total': this.total,
+                        'detalles': this.detalles
+                    }, configuracion)
+                    .then(function (response) {
+                        me.limpiar();
+                        me.close();
+                        me.listar();
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             });
-           
+
         },
         activarDesactivarMostrar(accion, item) {
             this.adModal = 1;
@@ -729,8 +864,8 @@ export default {
         },
         remove() {
             let me = this;
-            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Venta'} };
-            axios.delete(`venta/remove/${this.adId}`,  configuracion)
+            let configuracion = { headers: { 'x-access-token': this.$store.state.token, 'options': 'Elimino Venta' } };
+            axios.delete(`venta/remove/${this.adId}`, configuracion)
                 .then(function (response) {
                     me.adModal2 = false;
                     me.adNombre = '';

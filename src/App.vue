@@ -85,7 +85,7 @@
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>
-                  Movimientos
+                 Compras
                 </v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
@@ -113,7 +113,7 @@
 
           </v-list-group>
         </template>
-        <template v-if="esAdministrador || esVendedor">
+        <template v-if="esAdministrador || esVendedor|| esAlmacenero">
           <v-list-group>
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -250,7 +250,7 @@
            
           </v-list-group>
         </template>   
-        <template v-if="esAdministrador || esAlmacenero || esVendedor">
+        <template v-if="esAdministrador ">
           <v-list-group>
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -283,7 +283,7 @@
     >
       <v-toolbar-title style="width: 250px;  " class="ml-0 ">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <span class="hidden-sm-and-down">CREDITOS BRIAN </span>
+        <span class="hidden-sm-and-down">CREDITOS BRYAN </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn @click="salir()" style="color:#e5322d" icon v-if="logueado">

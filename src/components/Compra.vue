@@ -253,7 +253,7 @@
                 persona:'',
                 personas:[],
                 tipo_comprobante:'',
-                comprobantes: ['BOLETA','FACTURA','TICKET','GUIA'],
+                comprobantes: ['FACTURA','TICKET'],
                 serie_comprobante:'',
                 num_comprobante: '',
                 impuesto: 0.12,

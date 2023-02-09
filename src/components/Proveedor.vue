@@ -213,7 +213,7 @@
                 nombre:'',
                 tipo_persona:'Proveedor',
                 tipo_documento:'',
-                documentos: ['DNI','RUC','PASAPORTE','CEDULA'],
+                documentos: ['CEDULA','RUC'],
                 num_documento: '',
                 direccion: '',
                 telefono: '',

@@ -236,10 +236,12 @@
                                         delete
                                         </v-icon>
                                     </td>
+                                    <td class="text-xs-center">{{ props.item.createdAt.substring(0, 10) }}</td>
                                     <td class="text-xs-center">{{ props.item.nombre }}</td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.cantidad" type="number"></v-text-field></td>
+                                    <td class="text-xs-center"><v-text-field v-model="props.item.costo" type="number"></v-text-field></td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.precio" type="number"></v-text-field></td>
-                                    <td class="text-xs-right">$ {{ (props.item.cantidad / props.item.precio).toFixed(2)}}</td>
+                                    <td class="text-xs-right">$ {{ ((props.item.cantidad * props.item.costo)/1.12).toFixed(2)}}</td>
                                 </template>
                                 <template slot="no-data">
                                     <h3>No hay artículos agregados al detalle.</h3>
@@ -247,11 +249,11 @@
                             </v-data-table>
                             <v-flex class="text-xs-right">
                                 <strong>Total Parcial:</strong> $ 
-                                {{totalParcial=(total-totalImpuesto).toFixed(2)}}
+                                {{totalParcial=(total/1.12).toFixed(2)}}
                             </v-flex>
                             <v-flex class="text-xs-right">
                                 <strong>Total Impuesto:</strong> $ 
-                                {{totalImpuesto=((total*impuesto)/(1+impuesto)).toFixed(2)}}
+                                {{totalImpuesto=((total-totalParcial)).toFixed(2)}}
                             </v-flex>
                             <v-flex class="text-xs-right">
                                 <strong>Total Neto:</strong> $ {{total=calcularTotal}}
@@ -298,15 +300,17 @@
                 persona:'',
                 personas:[],
                 tipo_comprobante:'',
-                comprobantes: ['BOLETA','FACTURA','TICKET','GUIA'],
+                comprobantes: ['FACTURA','TICKET'],
                 serie_comprobante:10,
                 num_comprobante: '',
                 impuesto: 0.12,
                 codigo:'',
                 cabeceraDetalles:[
-                    { text: 'Borrar', value: 'borrar', sortable: false },
-                    { text: 'Artículo', value: 'articulo', sortable: false },
+                     { text: 'Borrar', value: 'borrar', sortable: false },
+                    { text: 'Fecha', value: 'createdAt', sortable: false },
+                    { text: 'Detalle', value: 'articulo', sortable: false },
                     { text: 'Cantidad', value: 'cantidad', sortable: false },
+                    { text: 'Costo', value: 'costo', sortable: false },
                     { text: 'Precio', value: 'precio', sortable: false },
                     { text: 'Sub Total', value: 'subtotal', sortable: false  }
                 ],
@@ -342,7 +346,7 @@
             calcularTotal: function(){
                 let resultado=0.0;
                 for(var i=0;i<this.detalles.length;i++){
-                    resultado=resultado+(this.detalles[i].cantidad*this.detalles[i].precio);
+                    resultado=resultado+(this.detalles[i].cantidad*this.detalles[i].costo);
                 }
                 return resultado;
             }
@@ -402,6 +406,7 @@
                 let configuracion= {headers : header};            
                 axios.get('articulo/queryCodigo?codigo='+this.codigo,configuracion).then(function (response){
                     me.agregarDetalle(response.data);
+                    //console.log(response.data);
                 }).catch(function(error){
                     me.errorArticulo='No existe el artículo.';
                 });
@@ -418,7 +423,9 @@
                             articuloId:data.id,
                             nombre:data.nombre,
                             cantidad:1,
-                            precio:data.precio_venta
+                            costo : 0,
+                            precio:data.precio_venta,
+                            createdAt : data.createdAt
                         }
                     );
                     this.codigo='';
