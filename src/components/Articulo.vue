@@ -50,13 +50,7 @@
                                             {{ validation.firstError("nombre") }}
                                         </p>
                                     </v-flex>
-                                    <v-flex xs12 sm6 md6>
-                                        <v-text-field type="number" v-model="stock" label="Stock">
-                                        </v-text-field>
-                                        <p class="red--text" v-show="valida == 1">
-                                            {{ validation.firstError("stock") }}
-                                        </p>
-                                    </v-flex>
+                                    
                                     <v-flex xs12 sm6 md6>
                                         <v-text-field v-model="precio_venta" label="precio_venta">
                                         </v-text-field>
