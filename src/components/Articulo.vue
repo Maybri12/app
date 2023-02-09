@@ -50,9 +50,15 @@
                                             {{ validation.firstError("nombre") }}
                                         </p>
                                     </v-flex>
-                                    
                                     <v-flex xs12 sm6 md6>
-                                        <v-text-field v-model="precio_venta" label="Precio Venta">
+                                        <v-text-field type="number" v-model="stock" label="Stock">
+                                        </v-text-field>
+                                        <p class="red--text" v-show="valida == 1">
+                                            {{ validation.firstError("stock") }}
+                                        </p>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field v-model="precio_venta" label="precio_venta">
                                         </v-text-field>
                                         <p class="red--text" v-show="valida == 1">
                                             {{ validation.firstError("precio_venta") }}
@@ -167,7 +173,7 @@
         </v-flex>
     </v-layout>
 </template>
-</script>
+<script>
 import axios from 'axios'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable';
@@ -282,7 +288,6 @@ export default {
                 { title: "Precio Venta", dataKey: "precio_venta" }
             ];
             var rows = [];
-
             this.articulos.map(function (x) {
                 rows.push(
                     {
@@ -301,7 +306,6 @@ export default {
                     doc.text("Lista de Artículos", 40, 30);
                 }
             });
-
             doc.save('Articulos.pdf');
         },
         selectCategoria() {
@@ -371,10 +375,10 @@ export default {
             this.validaMensaje = [];
             this.editedIndex = -1;
         },
-
         guardar() {
             let me = this;
-            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Agrego Articulo'} };
+            let header = { "Token": this.$store.state.token };
+            let configuracion = { headers: header };
             this.$validate().then(success => {
                 if (!success) {
                     this.valida = 1;
@@ -425,7 +429,6 @@ export default {
                         });
                 }
             });
-
         },
         open(){
             this.valida = 0;
@@ -460,7 +463,6 @@ export default {
             this.adModal2 = true;
             this.adNombre = item.nombre;
             this.adId = item.id;
-
         },
         activarDesactivarCerrar() {
             this.adModal = 0;
@@ -468,8 +470,9 @@ export default {
         },
         remove() {
             let me = this;
-            let configuracion = { headers: {'x-access-token': this.$store.state.token, 'options': 'Elimino Articulo'} };
-            axios.delete(`articulo/remove/${this.adId}`,  configuracion)
+            let header = { "Token": this.$store.state.token };
+            let configuracion = { headers: header };
+            axios.delete(`articulo/remove/${this.adId}`, {}, configuracion)
                 .then(function (response) {
                     me.adModal2 = false;
                     me.adNombre = '';
