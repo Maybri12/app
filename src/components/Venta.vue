@@ -618,7 +618,6 @@ export default {
             });
         },
         mostrarComprobante(item) {
-            console.log(item);
             this.limpiar();
             this.tipo_comprobante = item.tipo_comprobante;
             this.serie_comprobante = item.serie_comprobante;
@@ -752,7 +751,6 @@ export default {
             this.id = '';
             this.tipo_comprobante = '';
             this.serie_comprobante = '';
-            this.num_comprobante = '';
             this.impuesto = 0.12;
             this.codigo = '';
             this.total = 0;
