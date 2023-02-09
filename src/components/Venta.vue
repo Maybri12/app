@@ -321,11 +321,11 @@
                             </v-data-table>
                             <v-flex class="text-xs-right">
                                 <strong>Total Parcial:</strong> $
-                                {{ totalParcial = (total - totalImpuesto).toFixed(2) }}
+                                {{totalParcial=(total/1.12).toFixed(2)}}
                             </v-flex>
                             <v-flex class="text-xs-right">
                                 <strong>Total Impuesto:</strong> $
-                                {{ totalImpuesto = ((total * impuesto) / (1 + impuesto)).toFixed(2) }}
+                                {{totalImpuesto=((total-totalParcial)).toFixed(2)}}
                             </v-flex>
                             <v-flex class="text-xs-right">
                                 <strong>Total Neto:</strong> $ {{ total = calcularTotal }}

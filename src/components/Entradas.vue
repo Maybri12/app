@@ -45,7 +45,7 @@
                 <v-btn @click="crearPDF()">
                     <v-icon>print</v-icon>
                 </v-btn>
-                Suma total de ventas en corte : $ {{totalVenta = ventasTotal}}
+                Suma total de compras en corte : $ {{totalVenta = ventasTotal}}
                 <v-data-table :headers="headers" :items="ventas" :search="search">
                     <template v-slot:items="props">
                         <td class="justify-center layout px-0">
@@ -218,10 +218,10 @@ export default {
             doc.autoTable(columns, rows, {
                 margin: { top: 120 },
                 addPageContent: function (data) {
-                    doc.text("Reporte de ventas", 250, 30);
+                    doc.text("Reporte de compras", 250, 30);
                     doc.text("Fecha inicio : " + start, 40, 60);
                     doc.text("Fecha final  : " + end, 40, 85);
-                    doc.text("Total ventas : $" + total, 40, 110);
+                    doc.text("Total compras : $" + total, 40, 110);
                 }
             });
 
