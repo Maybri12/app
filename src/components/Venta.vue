@@ -45,17 +45,25 @@
                                             <v-data-table :headers="cabeceraArticulos" :items="articulos"
                                                 class="elevation-1">
                                                 <template v-slot:items="props">
-                                                    <td class="justify-center layout px-0">
-                                                        <v-icon small class="mr-2" @click="agregarDetalle(props.item)">
+                                                    <td class="justify-center layout px-0" >
+                                                        <v-icon v-if="props.item.stock !='0'" small class="mr-2" @click="agregarDetalle(props.item)">
                                                             add
                                                         </v-icon>
+                                                        <span v-else style="color:red"> NO HAY UNIDADES</span>
                                                     </td>
                                                     <td>{{ props.item.codigo }}</td>
                                                     <td>{{ props.item.nombre }}</td>
                                                     <td>{{ props.item.categorium.nombre }}</td>
-                                                    <td>{{ props.item.stock }}</td>
+                                                    <td>
+                                                        <span v-if="props.item.stock !='0'" style="color:blue">
+                                                           <b>{{ props.item.stock }}</b> </span>
+                                                        <span v-else>
+                                                          <span style="color:red">
+                                                            {{ props.item.stock }}
+                                                          </span> 
+                                                        </span>
+                                                    </td>
                                                     <td>{{ props.item.precio_venta }}</td>
-                                                    <td>{{ props.item.descripcion }}</td>
 
                                                 </template>
                                             </v-data-table>
@@ -306,7 +314,7 @@
                                     </td>
                                     <td class="text-xs-center">{{ props.item.nombre }}</td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.cantidad"
-                                            type="number"></v-text-field></td>
+                                      @input="verStok(props.item)"      type="number"></v-text-field></td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.precio"
                                             type="number"></v-text-field></td>
                                     <td class="text-xs-center"><v-text-field v-model="props.item.descuento"
@@ -464,7 +472,6 @@ export default {
                 { text: 'Categoría', value: 'categoria.nombre', sortable: true },
                 { text: 'Stock', value: 'stock', sortable: false },
                 { text: 'Precio Venta', value: 'precio_venta', sortable: false },
-                { text: 'Descripción', value: 'descripcion', sortable: false },
             ],
             verDetalle: 0,
             valida: 0,
@@ -533,6 +540,22 @@ export default {
         this.selectPersona();
     },
     methods: {
+        verStok(data){
+            if (data.cantidad !='') {
+                let cantidadd = parseInt(data.cantidad);
+                let stockk = parseInt(data.stock);
+                if (cantidadd > stockk) {
+                    const miData = this.detalles.filter(x => x.articuloId == data.articuloId)
+                    if (miData.length > 0) {
+                        for (let i = 0; i < this.detalles.length; i++) {
+                            this.detalles[i].cantidad = 0
+                        }
+                    }
+                    alert('NO HAY SUFICIENTE STOCK, SOLO EXISTEN '+ stockk + ' UNIDADES')
+                } 
+            }
+        
+        },
         ifCedula(event) {
             if (event.length > 5) {
                 this.resulta = ResultService.ifCedula(event)
@@ -669,7 +692,8 @@ export default {
                         nombre: data.nombre,
                         cantidad: 1,
                         precio: data.precio_venta,
-                        descuento: 0
+                        descuento: 0,
+                        stock : data.stock
                     }
                 );
                 this.codigo = '';
@@ -697,7 +721,6 @@ export default {
             let configuracion = { headers: header };
             axios.get('articulo/listName?nombre=' + this.texto, configuracion).then(function (response) {
                 me.articulos = response.data;
-                console.log(me.articulos);
             }).catch(function (error) {
                 console.log(error);
             });
@@ -711,7 +734,6 @@ export default {
             let configuracion = { headers: header };
             axios.get('venta/queryDetalles?id=' + id, configuracion).then(function (response) {
                 me.detalles = response.data;
-                console.log(me.detalles);
             }).catch(function (error) {
                 console.log(error);
             });
@@ -740,8 +762,6 @@ export default {
                         me.num_comprobante = parseInt(element.num_comprobante) +1
                     }
                 }
-                console.log(me.ventas);
-                console.log(me.num_comprobante);
             }).catch(function (error) {
                 console.log(error);
             });
